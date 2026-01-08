@@ -12,6 +12,50 @@
           "informationUri": "https://www.glog.ai",
           "rules": [
             {
+              "id": "bdb7ffdd-1a48-356b-9d5e-78a02d5e3287",
+              "name": "Problematic C function detected (malloc)",
+              "helpUri": "https://www.glog.ai/",
+              "help": {
+                "text": "",
+                "markdown": "This finding is classified as 'Likely Vulnerable' because the result of malloc is used as the destination in a memset call immediately after allocation, without any check to ensure that the allocation succeeded (i.e., that the returned pointer is not NULL). There is no zero guard or overflow guard present, and the first use is a memory operation (memset) that would dereference the pointer if it is NULL, leading to undefined behavior or a crash. The call verdict is 'GENUINE', further supporting that this is a real issue. The absence of a null guard before the first use is a critical factor in determining this as a genuine vulnerability.\n\n## In Context Remediation\nTo prevent a possible null pointer dereference after a failed memory allocation, always check the result of malloc before using the pointer. For example, if your original code is:\n\n```c\nHterBuf = malloc((DEFAULT_BUFLEN+1)/2);\nmemset(HterBuf, 0, (DEFAULT_BUFLEN+1)/2);\n```\n\nYou should add a null check before using the pointer:\n\n```c\nHterBuf = malloc((DEFAULT_BUFLEN+1)/2);\nif (HterBuf == NULL) {\n    // Handle allocation failure, e.g., log error and return or exit\n    return ERROR_OUT_OF_MEMORY;\n}\nmemset(HterBuf, 0, (DEFAULT_BUFLEN+1)/2);\n```\n\nThis ensures that if malloc fails and returns NULL, the program does not attempt to dereference a null pointer, which would cause undefined behavior or a crash. Always handle allocation failures gracefully to improve the robustness and security of your code.\n\n## References\n- [OWASP C-Based Toolchain Hardening Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [CWE-690: Unchecked Return Value to NULL Pointer Dereference](https://cwe.mitre.org/data/definitions/690.html)\n\n___\n"
+              },
+              "properties": {
+                "cwe": [
+                  {
+                    "id": "CWE-690",
+                    "url": "https://cwe.mitre.org/data/definitions/690.html"
+                  }
+                ],
+                "severity": "LOW",
+                "kind": "FAIL",
+                "tags": [
+                  "CWE-690"
+                ]
+              }
+            },
+            {
+              "id": "204d5341-e108-3d7e-afa8-0c011f249c3c",
+              "name": "Problematic C function detected (malloc)",
+              "helpUri": "https://www.glog.ai/",
+              "help": {
+                "text": "",
+                "markdown": "This finding is classified as 'Likely Vulnerable' because the result of a malloc call is used as the destination in a memory operation (strncpy) without a preceding check for NULL. There is no zero guard or overflow guard present, and the first use is a memory call (strncpy) which is considered dangerous if the pointer is NULL. Additionally, there is no null guard before the first use, increasing the risk of a null pointer dereference if malloc fails. The call verdict is 'GENUINE', further supporting the assessment that this is a real vulnerability.\n\n## In Context Remediation\nAlways check the result of malloc before using the allocated memory. If malloc returns NULL, handle the error appropriately (e.g., by returning an error code, logging, or cleaning up). For example, if your original code is:\n\n```c\nGterBuf = malloc(180);\nstrncpy(GterBuf, src, 180);\n```\n\nA safe remediation would be:\n\n```c\nGterBuf = malloc(180);\nif (GterBuf == NULL) {\n    // Handle allocation failure (e.g., log, cleanup, return error)\n    return;\n}\nstrncpy(GterBuf, src, 180);\n```\n\nThis ensures that you do not dereference a NULL pointer if the allocation fails, preventing a potential crash or undefined behavior.\n\n## References\n- [OWASP C-Based Toolchain Hardening Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n- [CWE-690: Unchecked Return Value to NULL Pointer Dereference](https://cwe.mitre.org/data/definitions/690.html)\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n\n___\n"
+              },
+              "properties": {
+                "cwe": [
+                  {
+                    "id": "CWE-690",
+                    "url": "https://cwe.mitre.org/data/definitions/690.html"
+                  }
+                ],
+                "severity": "LOW",
+                "kind": "FAIL",
+                "tags": [
+                  "CWE-690"
+                ]
+              }
+            },
+            {
               "id": "efdadf46-b885-3db2-8316-19149637d75e",
               "name": "Problematic C function detected (malloc)",
               "helpUri": "https://www.glog.ai/",
@@ -61,50 +105,6 @@
               }
             },
             {
-              "id": "bdb7ffdd-1a48-356b-9d5e-78a02d5e3287",
-              "name": "Problematic C function detected (malloc)",
-              "helpUri": "https://www.glog.ai/",
-              "help": {
-                "text": "",
-                "markdown": "This finding is classified as 'Likely Vulnerable' because the result of malloc is used as the destination in a memset call immediately after allocation, without any check to ensure that the allocation succeeded (i.e., that the returned pointer is not NULL). There is no zero guard or overflow guard present, and the first use is a memory operation (memset) that would dereference the pointer if it is NULL, leading to undefined behavior or a crash. The call verdict is 'GENUINE', further supporting that this is a real issue. The absence of a null guard before the first use is a critical factor in determining this as a genuine vulnerability.\n\n## In Context Remediation\nTo prevent a possible null pointer dereference after a failed memory allocation, always check the result of malloc before using the pointer. For example, if your original code is:\n\n```c\nHterBuf = malloc((DEFAULT_BUFLEN+1)/2);\nmemset(HterBuf, 0, (DEFAULT_BUFLEN+1)/2);\n```\n\nYou should add a null check before using the pointer:\n\n```c\nHterBuf = malloc((DEFAULT_BUFLEN+1)/2);\nif (HterBuf == NULL) {\n    // Handle allocation failure, e.g., log error and return or exit\n    return ERROR_OUT_OF_MEMORY;\n}\nmemset(HterBuf, 0, (DEFAULT_BUFLEN+1)/2);\n```\n\nThis ensures that if malloc fails and returns NULL, the program does not attempt to dereference a null pointer, which would cause undefined behavior or a crash. Always handle allocation failures gracefully to improve the robustness and security of your code.\n\n## References\n- [OWASP C-Based Toolchain Hardening Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [CWE-690: Unchecked Return Value to NULL Pointer Dereference](https://cwe.mitre.org/data/definitions/690.html)\n\n___\n"
-              },
-              "properties": {
-                "cwe": [
-                  {
-                    "id": "CWE-690",
-                    "url": "https://cwe.mitre.org/data/definitions/690.html"
-                  }
-                ],
-                "severity": "LOW",
-                "kind": "FAIL",
-                "tags": [
-                  "CWE-690"
-                ]
-              }
-            },
-            {
-              "id": "204d5341-e108-3d7e-afa8-0c011f249c3c",
-              "name": "Problematic C function detected (malloc)",
-              "helpUri": "https://www.glog.ai/",
-              "help": {
-                "text": "",
-                "markdown": "This finding is classified as 'Likely Vulnerable' because the result of a malloc call is used as the destination in a memory operation (strncpy) without a preceding check for NULL. There is no zero guard or overflow guard present, and the first use is a memory call (strncpy) which is considered dangerous if the pointer is NULL. Additionally, there is no null guard before the first use, increasing the risk of a null pointer dereference if malloc fails. The call verdict is 'GENUINE', further supporting the assessment that this is a real vulnerability.\n\n## In Context Remediation\nAlways check the result of malloc before using the allocated memory. If malloc returns NULL, handle the error appropriately (e.g., by returning an error code, logging, or cleaning up). For example, if your original code is:\n\n```c\nGterBuf = malloc(180);\nstrncpy(GterBuf, src, 180);\n```\n\nA safe remediation would be:\n\n```c\nGterBuf = malloc(180);\nif (GterBuf == NULL) {\n    // Handle allocation failure (e.g., log, cleanup, return error)\n    return;\n}\nstrncpy(GterBuf, src, 180);\n```\n\nThis ensures that you do not dereference a NULL pointer if the allocation fails, preventing a potential crash or undefined behavior.\n\n## References\n- [OWASP C-Based Toolchain Hardening Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n- [CWE-690: Unchecked Return Value to NULL Pointer Dereference](https://cwe.mitre.org/data/definitions/690.html)\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n\n___\n"
-              },
-              "properties": {
-                "cwe": [
-                  {
-                    "id": "CWE-690",
-                    "url": "https://cwe.mitre.org/data/definitions/690.html"
-                  }
-                ],
-                "severity": "LOW",
-                "kind": "FAIL",
-                "tags": [
-                  "CWE-690"
-                ]
-              }
-            },
-            {
               "id": "8341ea7f-9827-353f-a7ed-2cccc07d3f9c",
               "name": "Problematic C function detected (malloc)",
               "helpUri": "https://www.glog.ai/",
@@ -123,6 +123,28 @@
                 "kind": "FAIL",
                 "tags": [
                   "CWE-690"
+                ]
+              }
+            },
+            {
+              "id": "f05c6f2e-e052-3e35-8197-67a004aac604",
+              "name": "Detected Vulnerability in C Function (strlen)",
+              "helpUri": "https://www.glog.ai/",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe `strlen()` function in C++ is used to calculate the length of a string. However, it can lead to vulnerabilities if not used properly. The function counts the number of characters in a string until it reaches a null character (`'\\0'`). If the string is not null-terminated, `strlen()` will continue reading memory until it encounters a null character, potentially leading to a buffer overflow.\n\nIn the provided code snippet, `strlen(RecvBuf) > 3950`, the vulnerability arises if the length of `RecvBuf` exceeds 3950 and `RecvBuf` is not null-terminated. This could lead to a buffer overflow, causing the program to crash or leading to execution of arbitrary code.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, ensure that all strings are null-terminated. Also, avoid using `strlen()` to determine the size of a buffer. Instead, keep track of the buffer size separately.\n\n## Source Code Fix Recommendation\n\nInstead of using `strlen()`, use `strnlen()` which takes an additional parameter specifying the maximum number of characters to read. This can prevent buffer overflows.\n\n```cpp\nif (strnlen(RecvBuf, 3951) > 3950) {\n    // handle error\n}\n```\n\n## Library Dependencies\n\nThe `strlen()` function is part of the C standard library (`<cstring>` in C++), so no additional libraries are needed.\n\n## References\n\n- [OWASP Buffer Overflow](https://owasp.org/www-community/vulnerabilities/Buffer_Overflow)\n- [CWE-120: Buffer Copy without Checking Size of Input ('Classic Buffer Overflow')](https://cwe.mitre.org/data/definitions/120.html)"
+              },
+              "properties": {
+                "cwe": [
+                  {
+                    "id": "CWE-120",
+                    "url": "https://cwe.mitre.org/data/definitions/120.html"
+                  }
+                ],
+                "severity": "LOW",
+                "kind": "FAIL",
+                "tags": [
+                  "CWE-120"
                 ]
               }
             },
@@ -186,44 +208,34 @@
               }
             },
             {
-              "id": "c9ddf4c3-28f1-3b22-9980-2a468666ae02",
-              "name": "Banned C function detected (strncpy)",
-              "helpUri": "https://www.glog.ai/",
-              "help": {
-                "text": "",
-                "markdown": "This finding is considered a genuine vulnerability because the code copies up to 3000 bytes from one buffer to another using a function that does not check whether the source or destination pointers are valid (i.e., not null). Both the source and destination pointers may be null at this point in the code, as there are no explicit checks to ensure they are valid before the copy operation. If either pointer is null, this will result in undefined behavior, which can lead to program crashes or security vulnerabilities. The risk is further increased because the destination buffer is a pointer with no known capacity, and there is no evidence of bounds checking or null-termination after the copy. The classification and verdict both indicate a high-confidence, actionable issue.\n\n## In Context Remediation\nBefore performing the buffer copy, add explicit checks to ensure that both the source and destination pointers are not null. This prevents undefined behavior if either pointer is invalid.\n\n```c\nif (TrunBuf != NULL && RecvBuf != NULL) {\n    strncpy(TrunBuf, RecvBuf, 3000);\n    // Optionally, ensure null-termination:\n    TrunBuf[2999] = '\\0';\n} else {\n    // Handle error: one or both pointers are null\n}\n```\n\n## References\n- [OWASP C-Based Toolchain Hardening Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n- [CWE-119: Improper Restriction of Operations within the Bounds of a Memory Buffer](https://cwe.mitre.org/data/definitions/119.html)\n- [CWE-120: Buffer Copy without Checking Size of Input ('Classic Buffer Overflow')](https://cwe.mitre.org/data/definitions/120.html)\n- [CWE-476: NULL Pointer Dereference](https://cwe.mitre.org/data/definitions/476.html)\n- [OWASP Buffer Overflow](https://owasp.org/www-community/vulnerabilities/Buffer_Overflow)\n\n___\n"
-              },
-              "properties": {
-                "cwe": [
-                  {
-                    "id": "CWE-119",
-                    "url": "https://cwe.mitre.org/data/definitions/119.html"
-                  },
-                  {
-                    "id": "CWE-120",
-                    "url": "https://cwe.mitre.org/data/definitions/120.html"
-                  },
-                  {
-                    "id": "CWE-476",
-                    "url": "https://cwe.mitre.org/data/definitions/476.html"
-                  }
-                ],
-                "severity": "HIGH",
-                "kind": "FAIL",
-                "tags": [
-                  "CWE-119",
-                  "CWE-120",
-                  "CWE-476"
-                ]
-              }
-            },
-            {
               "id": "f9510372-e5da-3451-ad80-db59705ab582",
               "name": "Problematic C function detected (malloc)",
               "helpUri": "https://www.glog.ai/",
               "help": {
                 "text": "",
                 "markdown": "This finding is classified as 'Likely Vulnerable' because the result of the malloc call is used immediately as the destination in a memset operation without checking if the allocation succeeded (i.e., without verifying that the returned pointer is not NULL). This pattern can lead to a null pointer dereference if malloc fails and returns NULL, which is a well-known source of reliability and security issues in C programs. There is no zero guard, overflow guard, or null guard present before the first use, and the first use is a memory operation (memset) that will dereference the pointer. These factors all increase the likelihood that this is a genuine vulnerability and not a false positive.\n\n## In Context Remediation\nAlways check the result of malloc before using the allocated memory. If malloc returns NULL, handle the error appropriately (e.g., by returning an error code, logging, or cleaning up). For example, if your original code is:\n\n```c\nTrunBuf = malloc(3000);\nmemset(TrunBuf, 0, 3000);\n```\n\nA safe remediation would be:\n\n```c\nTrunBuf = malloc(3000);\nif (TrunBuf == NULL) {\n    // Handle allocation failure (log, cleanup, return error, etc.)\n    return; // or appropriate error handling\n}\nmemset(TrunBuf, 0, 3000);\n```\n\nThis ensures that memset is only called if the allocation succeeded, preventing a possible null pointer dereference.\n\n## References\n- [OWASP C-Based Toolchain Hardening Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [CWE-690: Unchecked Return Value to NULL Pointer Dereference](https://cwe.mitre.org/data/definitions/690.html)\n\n___\n"
+              },
+              "properties": {
+                "cwe": [
+                  {
+                    "id": "CWE-690",
+                    "url": "https://cwe.mitre.org/data/definitions/690.html"
+                  }
+                ],
+                "severity": "LOW",
+                "kind": "FAIL",
+                "tags": [
+                  "CWE-690"
+                ]
+              }
+            },
+            {
+              "id": "9df085a5-2a9b-3980-8f79-edc1f1c621b9",
+              "name": "Problematic C function detected (malloc)",
+              "helpUri": "https://www.glog.ai/",
+              "help": {
+                "text": "",
+                "markdown": "This finding is classified as 'Likely Vulnerable: malloc result used without null check (possible null deref)', and the call verdict is 'GENUINE', indicating a high-confidence, actionable issue. The code allocates memory using malloc(120) and assigns the result to SrunBuf, but there is no check to ensure that the allocation succeeded before the pointer is used as the destination in a memset call. This pattern can lead to a null pointer dereference if malloc fails and returns NULL. There are no zero guards, overflow guards, or null guards present before the first use, and the first use is a memory operation (memset) that will dereference the pointer. This is a common and critical vulnerability in C/C++ code, especially in environments where memory exhaustion is possible.\n\n## In Context Remediation\nAlways check the result of malloc before using the allocated memory. If malloc returns NULL, handle the error appropriately (e.g., by returning an error code, logging, or cleaning up). For example, if your original code is:\n\n```c\nSrunBuf = malloc(120);\nmemset(SrunBuf, 0, 120);\n```\n\nA safe remediation would be:\n\n```c\nSrunBuf = malloc(120);\nif (SrunBuf == NULL) {\n    // Handle allocation failure (e.g., log, cleanup, return error)\n    return ERROR_OUT_OF_MEMORY;\n}\nmemset(SrunBuf, 0, 120);\n```\n\nThis ensures that the pointer is not dereferenced if the allocation fails, preventing a potential crash or undefined behavior.\n\n## References\n- [OWASP C-Based Toolchain Hardening Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [CWE-690: Unchecked Return Value to NULL Pointer Dereference](https://cwe.mitre.org/data/definitions/690.html)\n\n___\n"
               },
               "properties": {
                 "cwe": [
@@ -272,12 +284,12 @@
               }
             },
             {
-              "id": "9df085a5-2a9b-3980-8f79-edc1f1c621b9",
+              "id": "8e47a262-2390-39df-8576-3fdbe1b22973",
               "name": "Problematic C function detected (malloc)",
               "helpUri": "https://www.glog.ai/",
               "help": {
                 "text": "",
-                "markdown": "This finding is classified as 'Likely Vulnerable: malloc result used without null check (possible null deref)', and the call verdict is 'GENUINE', indicating a high-confidence, actionable issue. The code allocates memory using malloc(120) and assigns the result to SrunBuf, but there is no check to ensure that the allocation succeeded before the pointer is used as the destination in a memset call. This pattern can lead to a null pointer dereference if malloc fails and returns NULL. There are no zero guards, overflow guards, or null guards present before the first use, and the first use is a memory operation (memset) that will dereference the pointer. This is a common and critical vulnerability in C/C++ code, especially in environments where memory exhaustion is possible.\n\n## In Context Remediation\nAlways check the result of malloc before using the allocated memory. If malloc returns NULL, handle the error appropriately (e.g., by returning an error code, logging, or cleaning up). For example, if your original code is:\n\n```c\nSrunBuf = malloc(120);\nmemset(SrunBuf, 0, 120);\n```\n\nA safe remediation would be:\n\n```c\nSrunBuf = malloc(120);\nif (SrunBuf == NULL) {\n    // Handle allocation failure (e.g., log, cleanup, return error)\n    return ERROR_OUT_OF_MEMORY;\n}\nmemset(SrunBuf, 0, 120);\n```\n\nThis ensures that the pointer is not dereferenced if the allocation fails, preventing a potential crash or undefined behavior.\n\n## References\n- [OWASP C-Based Toolchain Hardening Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [CWE-690: Unchecked Return Value to NULL Pointer Dereference](https://cwe.mitre.org/data/definitions/690.html)\n\n___\n"
+                "markdown": "This finding is classified as 'Likely Vulnerable' because the result of the malloc call is used as the destination in a memset operation immediately after allocation, without any check to ensure that the allocation succeeded (i.e., that the returned pointer is not NULL). This pattern can lead to a null pointer dereference if malloc fails, which is a common and serious reliability and security issue. There are no zero guards, overflow guards, or null checks present before the first use. The first use is a memory operation (memset), which is considered dangerous if the pointer is NULL. The call verdict is 'GENUINE', further supporting the assessment that this is a real vulnerability.\n\n## In Context Remediation\nTo prevent a null pointer dereference after a failed memory allocation, always check the result of malloc before using the returned pointer. For example, if your original code is:\n\n```c\nLtimeBuf = malloc(120);\nmemset(LtimeBuf, 0, 120);\n```\n\nYou should add a null check before using LtimeBuf:\n\n```c\nLtimeBuf = malloc(120);\nif (LtimeBuf == NULL) {\n    // Handle allocation failure, e.g., log error and return or exit\n    return;\n}\nmemset(LtimeBuf, 0, 120);\n```\n\nThis ensures that if malloc fails and returns NULL, the program does not attempt to dereference a null pointer, which would cause undefined behavior or a crash.\n\n## References\n- [OWASP C-Based Toolchain Hardening Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [CWE-690: Unchecked Return Value to NULL Pointer Dereference](https://cwe.mitre.org/data/definitions/690.html)\n\n___\n"
               },
               "properties": {
                 "cwe": [
@@ -317,28 +329,6 @@
                 "tags": [
                   "CWE-119",
                   "CWE-476"
-                ]
-              }
-            },
-            {
-              "id": "8e47a262-2390-39df-8576-3fdbe1b22973",
-              "name": "Problematic C function detected (malloc)",
-              "helpUri": "https://www.glog.ai/",
-              "help": {
-                "text": "",
-                "markdown": "This finding is classified as 'Likely Vulnerable' because the result of the malloc call is used as the destination in a memset operation immediately after allocation, without any check to ensure that the allocation succeeded (i.e., that the returned pointer is not NULL). This pattern can lead to a null pointer dereference if malloc fails, which is a common and serious reliability and security issue. There are no zero guards, overflow guards, or null checks present before the first use. The first use is a memory operation (memset), which is considered dangerous if the pointer is NULL. The call verdict is 'GENUINE', further supporting the assessment that this is a real vulnerability.\n\n## In Context Remediation\nTo prevent a null pointer dereference after a failed memory allocation, always check the result of malloc before using the returned pointer. For example, if your original code is:\n\n```c\nLtimeBuf = malloc(120);\nmemset(LtimeBuf, 0, 120);\n```\n\nYou should add a null check before using LtimeBuf:\n\n```c\nLtimeBuf = malloc(120);\nif (LtimeBuf == NULL) {\n    // Handle allocation failure, e.g., log error and return or exit\n    return;\n}\nmemset(LtimeBuf, 0, 120);\n```\n\nThis ensures that if malloc fails and returns NULL, the program does not attempt to dereference a null pointer, which would cause undefined behavior or a crash.\n\n## References\n- [OWASP C-Based Toolchain Hardening Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [CWE-690: Unchecked Return Value to NULL Pointer Dereference](https://cwe.mitre.org/data/definitions/690.html)\n\n___\n"
-              },
-              "properties": {
-                "cwe": [
-                  {
-                    "id": "CWE-690",
-                    "url": "https://cwe.mitre.org/data/definitions/690.html"
-                  }
-                ],
-                "severity": "LOW",
-                "kind": "FAIL",
-                "tags": [
-                  "CWE-690"
                 ]
               }
             },
@@ -451,28 +441,6 @@
               }
             },
             {
-              "id": "779b311e-3a70-3dff-9195-15fe204465ff",
-              "name": "Problematic C function detected (malloc)",
-              "helpUri": "https://www.glog.ai/",
-              "help": {
-                "text": "",
-                "markdown": "This finding is classified as 'Likely Vulnerable: malloc result used without null check (possible null deref)', which indicates a high-confidence, actionable issue. The malloc call allocates a fixed size (1024 bytes) and assigns the result to 'GdogBuf'. The first use of this pointer is as the destination in a memory operation (strncpy), and there is no null check before this use. This means that if malloc fails and returns NULL, the subsequent use of 'GdogBuf' could result in a null pointer dereference, leading to undefined behavior or a crash. No zero guard or overflow guard is present, and the pointer is not checked for NULL before use. These factors confirm the genuineness of the vulnerability.\n\n## In Context Remediation\nAlways check the result of malloc before using the allocated pointer. If malloc fails, it returns NULL, and using this pointer without checking can cause a crash or undefined behavior. Here is how you can fix the code:\n\n```c\nGdogBuf = malloc(1024);\nif (GdogBuf == NULL) {\n    // Handle allocation failure, e.g., log error and return or exit\n    fprintf(stderr, \"Memory allocation failed for GdogBuf\\n\");\n    return; // or appropriate error handling\n}\n```\n\nThis ensures that the pointer is valid before it is used in subsequent operations such as strncpy. For more information on secure memory handling, see:\n\n## References\n- [OWASP C-Based Toolchain Hardening Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n- [CWE-690: Unchecked Return Value to NULL Pointer Dereference](https://cwe.mitre.org/data/definitions/690.html)\n\n\n___\n"
-              },
-              "properties": {
-                "cwe": [
-                  {
-                    "id": "CWE-690",
-                    "url": "https://cwe.mitre.org/data/definitions/690.html"
-                  }
-                ],
-                "severity": "LOW",
-                "kind": "FAIL",
-                "tags": [
-                  "CWE-690"
-                ]
-              }
-            },
-            {
               "id": "bc04a9f8-4196-3744-99f1-4455de62ffc7",
               "name": "Problematic C function detected (malloc)",
               "helpUri": "https://www.glog.ai/",
@@ -495,24 +463,90 @@
               }
             },
             {
-              "id": "f05c6f2e-e052-3e35-8197-67a004aac604",
-              "name": "Detected Vulnerability in C Function (strlen)",
+              "id": "779b311e-3a70-3dff-9195-15fe204465ff",
+              "name": "Problematic C function detected (malloc)",
               "helpUri": "https://www.glog.ai/",
               "help": {
                 "text": "",
-                "markdown": "## Description\n\nThe `strlen()` function in C++ is used to calculate the length of a string. However, it can lead to vulnerabilities if not used properly. The function counts the number of characters in a string until it reaches a null character (`'\\0'`). If the string is not null-terminated, `strlen()` will continue reading memory until it encounters a null character, potentially leading to a buffer overflow.\n\nIn the provided code snippet, `strlen(RecvBuf) > 3950`, the vulnerability arises if the length of `RecvBuf` exceeds 3950 and `RecvBuf` is not null-terminated. This could lead to a buffer overflow, causing the program to crash or leading to execution of arbitrary code.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, ensure that all strings are null-terminated. Also, avoid using `strlen()` to determine the size of a buffer. Instead, keep track of the buffer size separately.\n\n## Source Code Fix Recommendation\n\nInstead of using `strlen()`, use `strnlen()` which takes an additional parameter specifying the maximum number of characters to read. This can prevent buffer overflows.\n\n```cpp\nif (strnlen(RecvBuf, 3951) > 3950) {\n    // handle error\n}\n```\n\n## Library Dependencies\n\nThe `strlen()` function is part of the C standard library (`<cstring>` in C++), so no additional libraries are needed.\n\n## References\n\n- [OWASP Buffer Overflow](https://owasp.org/www-community/vulnerabilities/Buffer_Overflow)\n- [CWE-120: Buffer Copy without Checking Size of Input ('Classic Buffer Overflow')](https://cwe.mitre.org/data/definitions/120.html)"
+                "markdown": "This finding is classified as 'Likely Vulnerable: malloc result used without null check (possible null deref)', which indicates a high-confidence, actionable issue. The malloc call allocates a fixed size (1024 bytes) and assigns the result to 'GdogBuf'. The first use of this pointer is as the destination in a memory operation (strncpy), and there is no null check before this use. This means that if malloc fails and returns NULL, the subsequent use of 'GdogBuf' could result in a null pointer dereference, leading to undefined behavior or a crash. No zero guard or overflow guard is present, and the pointer is not checked for NULL before use. These factors confirm the genuineness of the vulnerability.\n\n## In Context Remediation\nAlways check the result of malloc before using the allocated pointer. If malloc fails, it returns NULL, and using this pointer without checking can cause a crash or undefined behavior. Here is how you can fix the code:\n\n```c\nGdogBuf = malloc(1024);\nif (GdogBuf == NULL) {\n    // Handle allocation failure, e.g., log error and return or exit\n    fprintf(stderr, \"Memory allocation failed for GdogBuf\\n\");\n    return; // or appropriate error handling\n}\n```\n\nThis ensures that the pointer is valid before it is used in subsequent operations such as strncpy. For more information on secure memory handling, see:\n\n## References\n- [OWASP C-Based Toolchain Hardening Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n- [CWE-690: Unchecked Return Value to NULL Pointer Dereference](https://cwe.mitre.org/data/definitions/690.html)\n\n\n___\n"
               },
               "properties": {
                 "cwe": [
                   {
-                    "id": "CWE-120",
-                    "url": "https://cwe.mitre.org/data/definitions/120.html"
+                    "id": "CWE-690",
+                    "url": "https://cwe.mitre.org/data/definitions/690.html"
                   }
                 ],
                 "severity": "LOW",
                 "kind": "FAIL",
                 "tags": [
-                  "CWE-120"
+                  "CWE-690"
+                ]
+              }
+            },
+            {
+              "id": "e59f3ee1-9733-3df9-b082-1b428f556370",
+              "name": "\"Detected Use of Prohibited C Function (strcpy)\"",
+              "helpUri": "https://www.glog.ai/",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe `strcpy` function in C++ is a standard library function that copies a string. However, it does not check the size of the destination buffer, which can lead to buffer overflow if the source string is larger than the destination buffer. This can cause a program to crash or, in the worst case, allow an attacker to execute arbitrary code.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, you should always ensure that the destination buffer is large enough to hold the source string including the null-terminating character. This can be done by using safer alternatives to `strcpy` such as `strncpy`, `strlcpy` or `memcpy` which allow you to specify the maximum number of characters to be copied.\n\n## Source Code Fix Recommendation\n\nReplace the `strcpy` function with `strncpy` function:\n\n```cpp\nstrncpy(Buffer2S, Input, sizeof(Buffer2S) - 1);\nBuffer2S[sizeof(Buffer2S) - 1] = '\\0';\n```\n\n## Library Dependencies\n\nThe `strcpy` and `strncpy` functions are part of the C standard library, so you need to include the `cstring` header:\n\n```cpp\n#include <cstring>\n```\n\n## References\n\n- [OWASP C++ Secure Coding Practices](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n- [CWE-119: Improper Restriction of Operations within the Bounds of a Memory Buffer](https://cwe.mitre.org/data/definitions/119.html)"
+              },
+              "properties": {
+                "cwe": [
+                  {
+                    "id": "CWE-119",
+                    "url": "https://cwe.mitre.org/data/definitions/119.html"
+                  }
+                ],
+                "severity": "HIGH",
+                "kind": "FAIL",
+                "tags": [
+                  "CWE-119"
+                ]
+              }
+            },
+            {
+              "id": "d3cf1f61-cd70-32c1-888b-72335c05f369",
+              "name": "\"Detected Use of Prohibited C Function (strcpy)\"",
+              "helpUri": "https://www.glog.ai/",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe `strcpy` function in C++ is a standard library function that copies a string. However, it does not check the size of the destination buffer, which can lead to buffer overflow if the source string is larger than the destination buffer. This can cause a program to crash or, in the worst case, allow an attacker to execute arbitrary code.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, you should always ensure that the destination buffer is large enough to hold the source string including the null-terminating character. This can be done by using safer alternatives to `strcpy` such as `strncpy`, `strlcpy` or `memcpy` which allow you to specify the maximum number of characters to be copied.\n\n## Source Code Fix Recommendation\n\nReplace the `strcpy` function with `strncpy` function:\n\n```cpp\nstrncpy(Buffer2S, Input, sizeof(Buffer2S) - 1);\nBuffer2S[sizeof(Buffer2S) - 1] = '\\0';\n```\n\n## Library Dependencies\n\nThe `strcpy` and `strncpy` functions are part of the C standard library, so you need to include the `cstring` header:\n\n```cpp\n#include <cstring>\n```\n\n## References\n\n- [OWASP C++ Secure Coding Practices](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n- [CWE-119: Improper Restriction of Operations within the Bounds of a Memory Buffer](https://cwe.mitre.org/data/definitions/119.html)"
+              },
+              "properties": {
+                "cwe": [
+                  {
+                    "id": "CWE-119",
+                    "url": "https://cwe.mitre.org/data/definitions/119.html"
+                  }
+                ],
+                "severity": "HIGH",
+                "kind": "FAIL",
+                "tags": [
+                  "CWE-119"
+                ]
+              }
+            },
+            {
+              "id": "74e668dd-79a8-3ff9-80f2-d72df568bbc8",
+              "name": "\"Detected Use of Prohibited C Function (strcpy)\"",
+              "helpUri": "https://www.glog.ai/",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe `strcpy` function in C++ is a standard library function that copies a string. However, it does not check the size of the destination buffer, which can lead to buffer overflow if the source string is larger than the destination buffer. This can cause a program to crash or, in the worst case, allow an attacker to execute arbitrary code.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, you should always ensure that the destination buffer is large enough to hold the source string including the null-terminating character. This can be done by using safer alternatives to `strcpy` such as `strncpy`, `strlcpy` or `memcpy` which allow you to specify the maximum number of characters to be copied.\n\n## Source Code Fix Recommendation\n\nReplace the `strcpy` function with `strncpy` function:\n\n```cpp\nstrncpy(Buffer2S, Input, sizeof(Buffer2S) - 1);\nBuffer2S[sizeof(Buffer2S) - 1] = '\\0';\n```\n\n## Library Dependencies\n\nThe `strcpy` and `strncpy` functions are part of the C standard library, so you need to include the `cstring` header:\n\n```cpp\n#include <cstring>\n```\n\n## References\n\n- [OWASP C++ Secure Coding Practices](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n- [CWE-119: Improper Restriction of Operations within the Bounds of a Memory Buffer](https://cwe.mitre.org/data/definitions/119.html)"
+              },
+              "properties": {
+                "cwe": [
+                  {
+                    "id": "CWE-119",
+                    "url": "https://cwe.mitre.org/data/definitions/119.html"
+                  }
+                ],
+                "severity": "HIGH",
+                "kind": "FAIL",
+                "tags": [
+                  "CWE-119"
                 ]
               }
             },
@@ -540,28 +574,6 @@
             },
             {
               "id": "e12227ce-fae1-396e-8449-e82f9bc49eb0",
-              "name": "\"Detected Use of Prohibited C Function (strcpy)\"",
-              "helpUri": "https://www.glog.ai/",
-              "help": {
-                "text": "",
-                "markdown": "## Description\n\nThe `strcpy` function in C++ is a standard library function that copies a string. However, it does not check the size of the destination buffer, which can lead to buffer overflow if the source string is larger than the destination buffer. This can cause a program to crash or, in the worst case, allow an attacker to execute arbitrary code.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, you should always ensure that the destination buffer is large enough to hold the source string including the null-terminating character. This can be done by using safer alternatives to `strcpy` such as `strncpy`, `strlcpy` or `memcpy` which allow you to specify the maximum number of characters to be copied.\n\n## Source Code Fix Recommendation\n\nReplace the `strcpy` function with `strncpy` function:\n\n```cpp\nstrncpy(Buffer2S, Input, sizeof(Buffer2S) - 1);\nBuffer2S[sizeof(Buffer2S) - 1] = '\\0';\n```\n\n## Library Dependencies\n\nThe `strcpy` and `strncpy` functions are part of the C standard library, so you need to include the `cstring` header:\n\n```cpp\n#include <cstring>\n```\n\n## References\n\n- [OWASP C++ Secure Coding Practices](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n- [CWE-119: Improper Restriction of Operations within the Bounds of a Memory Buffer](https://cwe.mitre.org/data/definitions/119.html)"
-              },
-              "properties": {
-                "cwe": [
-                  {
-                    "id": "CWE-119",
-                    "url": "https://cwe.mitre.org/data/definitions/119.html"
-                  }
-                ],
-                "severity": "HIGH",
-                "kind": "FAIL",
-                "tags": [
-                  "CWE-119"
-                ]
-              }
-            },
-            {
-              "id": "672f9062-60ac-3120-9b88-7b8ab22448ba",
               "name": "\"Detected Use of Prohibited C Function (strcpy)\"",
               "helpUri": "https://www.glog.ai/",
               "help": {
@@ -615,95 +627,7 @@
               }
             },
             {
-              "id": "e59f3ee1-9733-3df9-b082-1b428f556370",
-              "name": "\"Detected Use of Prohibited C Function (strcpy)\"",
-              "helpUri": "https://www.glog.ai/",
-              "help": {
-                "text": "",
-                "markdown": "## Description\n\nThe `strcpy` function in C++ is a standard library function that copies a string. However, it does not check the size of the destination buffer, which can lead to buffer overflow if the source string is larger than the destination buffer. This can cause a program to crash or, in the worst case, allow an attacker to execute arbitrary code.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, you should always ensure that the destination buffer is large enough to hold the source string including the null-terminating character. This can be done by using safer alternatives to `strcpy` such as `strncpy`, `strlcpy` or `memcpy` which allow you to specify the maximum number of characters to be copied.\n\n## Source Code Fix Recommendation\n\nReplace the `strcpy` function with `strncpy` function:\n\n```cpp\nstrncpy(Buffer2S, Input, sizeof(Buffer2S) - 1);\nBuffer2S[sizeof(Buffer2S) - 1] = '\\0';\n```\n\n## Library Dependencies\n\nThe `strcpy` and `strncpy` functions are part of the C standard library, so you need to include the `cstring` header:\n\n```cpp\n#include <cstring>\n```\n\n## References\n\n- [OWASP C++ Secure Coding Practices](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n- [CWE-119: Improper Restriction of Operations within the Bounds of a Memory Buffer](https://cwe.mitre.org/data/definitions/119.html)"
-              },
-              "properties": {
-                "cwe": [
-                  {
-                    "id": "CWE-119",
-                    "url": "https://cwe.mitre.org/data/definitions/119.html"
-                  }
-                ],
-                "severity": "HIGH",
-                "kind": "FAIL",
-                "tags": [
-                  "CWE-119"
-                ]
-              }
-            },
-            {
-              "id": "d3cf1f61-cd70-32c1-888b-72335c05f369",
-              "name": "\"Detected Use of Prohibited C Function (strcpy)\"",
-              "helpUri": "https://www.glog.ai/",
-              "help": {
-                "text": "",
-                "markdown": "## Description\n\nThe `strcpy` function in C++ is a standard library function that copies a string. However, it does not check the size of the destination buffer, which can lead to buffer overflow if the source string is larger than the destination buffer. This can cause a program to crash or, in the worst case, allow an attacker to execute arbitrary code.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, you should always ensure that the destination buffer is large enough to hold the source string including the null-terminating character. This can be done by using safer alternatives to `strcpy` such as `strncpy`, `strlcpy` or `memcpy` which allow you to specify the maximum number of characters to be copied.\n\n## Source Code Fix Recommendation\n\nReplace the `strcpy` function with `strncpy` function:\n\n```cpp\nstrncpy(Buffer2S, Input, sizeof(Buffer2S) - 1);\nBuffer2S[sizeof(Buffer2S) - 1] = '\\0';\n```\n\n## Library Dependencies\n\nThe `strcpy` and `strncpy` functions are part of the C standard library, so you need to include the `cstring` header:\n\n```cpp\n#include <cstring>\n```\n\n## References\n\n- [OWASP C++ Secure Coding Practices](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n- [CWE-119: Improper Restriction of Operations within the Bounds of a Memory Buffer](https://cwe.mitre.org/data/definitions/119.html)"
-              },
-              "properties": {
-                "cwe": [
-                  {
-                    "id": "CWE-119",
-                    "url": "https://cwe.mitre.org/data/definitions/119.html"
-                  }
-                ],
-                "severity": "HIGH",
-                "kind": "FAIL",
-                "tags": [
-                  "CWE-119"
-                ]
-              }
-            },
-            {
-              "id": "00448155-e255-3e9d-ab46-8b62dea81a76",
-              "name": "\"Detected Use of Prohibited C Function (strcpy)\"",
-              "helpUri": "https://www.glog.ai/",
-              "help": {
-                "text": "",
-                "markdown": "## Description\n\nThe `strcpy` function in C++ is a standard library function that copies a string. However, it does not check the size of the destination buffer, which can lead to buffer overflow if the source string is larger than the destination buffer. This can cause a program to crash or, in the worst case, allow an attacker to execute arbitrary code.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, you should always ensure that the destination buffer is large enough to hold the source string including the null-terminating character. This can be done by using safer alternatives to `strcpy` such as `strncpy`, `strlcpy` or `memcpy` which allow you to specify the maximum number of characters to be copied.\n\n## Source Code Fix Recommendation\n\nReplace the `strcpy` function with `strncpy` function:\n\n```cpp\nstrncpy(Buffer2S, Input, sizeof(Buffer2S) - 1);\nBuffer2S[sizeof(Buffer2S) - 1] = '\\0';\n```\n\n## Library Dependencies\n\nThe `strcpy` and `strncpy` functions are part of the C standard library, so you need to include the `cstring` header:\n\n```cpp\n#include <cstring>\n```\n\n## References\n\n- [OWASP C++ Secure Coding Practices](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n- [CWE-119: Improper Restriction of Operations within the Bounds of a Memory Buffer](https://cwe.mitre.org/data/definitions/119.html)"
-              },
-              "properties": {
-                "cwe": [
-                  {
-                    "id": "CWE-119",
-                    "url": "https://cwe.mitre.org/data/definitions/119.html"
-                  }
-                ],
-                "severity": "HIGH",
-                "kind": "FAIL",
-                "tags": [
-                  "CWE-119"
-                ]
-              }
-            },
-            {
-              "id": "e7828855-98ed-3379-b683-56e26fb8b2f7",
-              "name": "\"Detected Use of Prohibited C Function (strcpy)\"",
-              "helpUri": "https://www.glog.ai/",
-              "help": {
-                "text": "",
-                "markdown": "## Description\n\nThe `strcpy` function in C++ is a standard library function that copies a string. However, it does not check the size of the destination buffer, which can lead to buffer overflow if the source string is larger than the destination buffer. This can cause a program to crash or, in the worst case, allow an attacker to execute arbitrary code.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, you should always ensure that the destination buffer is large enough to hold the source string including the null-terminating character. This can be done by using safer alternatives to `strcpy` such as `strncpy`, `strlcpy` or `memcpy` which allow you to specify the maximum number of characters to be copied.\n\n## Source Code Fix Recommendation\n\nReplace the `strcpy` function with `strncpy` function:\n\n```cpp\nstrncpy(Buffer2S, Input, sizeof(Buffer2S) - 1);\nBuffer2S[sizeof(Buffer2S) - 1] = '\\0';\n```\n\n## Library Dependencies\n\nThe `strcpy` and `strncpy` functions are part of the C standard library, so you need to include the `cstring` header:\n\n```cpp\n#include <cstring>\n```\n\n## References\n\n- [OWASP C++ Secure Coding Practices](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n- [CWE-119: Improper Restriction of Operations within the Bounds of a Memory Buffer](https://cwe.mitre.org/data/definitions/119.html)"
-              },
-              "properties": {
-                "cwe": [
-                  {
-                    "id": "CWE-119",
-                    "url": "https://cwe.mitre.org/data/definitions/119.html"
-                  }
-                ],
-                "severity": "HIGH",
-                "kind": "FAIL",
-                "tags": [
-                  "CWE-119"
-                ]
-              }
-            },
-            {
-              "id": "74e668dd-79a8-3ff9-80f2-d72df568bbc8",
+              "id": "672f9062-60ac-3120-9b88-7b8ab22448ba",
               "name": "\"Detected Use of Prohibited C Function (strcpy)\"",
               "helpUri": "https://www.glog.ai/",
               "help": {
@@ -747,28 +671,6 @@
               }
             },
             {
-              "id": "c492feb6-e097-3717-99e6-94b621911032",
-              "name": "Detected Prohibited C Function",
-              "helpUri": "https://www.glog.ai/",
-              "help": {
-                "text": "",
-                "markdown": "## Description\n\n\"Detected Prohibited C Function\" vulnerability refers to the use of insecure C library functions that can lead to various security issues such as buffer overflows, format string vulnerabilities, integer overflows, etc. In this case, the function `atoi()` is used, which is a standard library function in C++ that converts a string argument to an integer. The problem with `atoi()` is that it does not handle errors properly. If the input string cannot be converted into an integer, it returns zero, which can lead to unexpected behavior.\n\n## Mitigation Advice\n\nAvoid using `atoi()`. Instead, use safer alternatives such as `strtol()` or `sscanf()`, which provide error checking. Also, always validate and sanitize user input to prevent injection attacks.\n\n## Source Code Fix Recommendation\n\nReplace `atoi(argv[1])` with the following code:\n\n```cpp\n#include <cstdlib>\n#include <cerrno>\n\nchar *endptr;\nlong val = strtol(argv[1], &endptr, 10);\n\nif ((errno == ERANGE && (val == LONG_MAX || val == LONG_MIN)) || (errno != 0 && val == 0)) {\n    perror(\"strtol\");\n    exit(EXIT_FAILURE);\n}\n\nif (endptr == argv[1]) {\n    fprintf(stderr, \"No digits were found\\n\");\n    exit(EXIT_FAILURE);\n}\n```\n\n## Library Dependencies\n\nThe code example requires the following library dependencies:\n\n- cstdlib\n- cerrno\n\n## References\n\n- [OWASP C++ Secure Coding Practices](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n- [CWE-242: Use of Inherently Dangerous Function](https://cwe.mitre.org/data/definitions/242.html)"
-              },
-              "properties": {
-                "cwe": [
-                  {
-                    "id": "CWE-242",
-                    "url": "https://cwe.mitre.org/data/definitions/242.html"
-                  }
-                ],
-                "severity": "MEDIUM",
-                "kind": "FAIL",
-                "tags": [
-                  "CWE-242"
-                ]
-              }
-            },
-            {
               "id": "a4d072bf-5ae6-3408-91dd-2a745d716279",
               "name": "Banned C function detected (strncpy)",
               "helpUri": "https://www.glog.ai/",
@@ -804,6 +706,72 @@
                   "CWE-476"
                 ]
               }
+            },
+            {
+              "id": "00448155-e255-3e9d-ab46-8b62dea81a76",
+              "name": "\"Detected Use of Prohibited C Function (strcpy)\"",
+              "helpUri": "https://www.glog.ai/",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe `strcpy` function in C++ is a standard library function that copies a string. However, it does not check the size of the destination buffer, which can lead to buffer overflow if the source string is larger than the destination buffer. This can cause a program to crash or, in the worst case, allow an attacker to execute arbitrary code.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, you should always ensure that the destination buffer is large enough to hold the source string including the null-terminating character. This can be done by using safer alternatives to `strcpy` such as `strncpy`, `strlcpy` or `memcpy` which allow you to specify the maximum number of characters to be copied.\n\n## Source Code Fix Recommendation\n\nReplace the `strcpy` function with `strncpy` function:\n\n```cpp\nstrncpy(Buffer2S, Input, sizeof(Buffer2S) - 1);\nBuffer2S[sizeof(Buffer2S) - 1] = '\\0';\n```\n\n## Library Dependencies\n\nThe `strcpy` and `strncpy` functions are part of the C standard library, so you need to include the `cstring` header:\n\n```cpp\n#include <cstring>\n```\n\n## References\n\n- [OWASP C++ Secure Coding Practices](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n- [CWE-119: Improper Restriction of Operations within the Bounds of a Memory Buffer](https://cwe.mitre.org/data/definitions/119.html)"
+              },
+              "properties": {
+                "cwe": [
+                  {
+                    "id": "CWE-119",
+                    "url": "https://cwe.mitre.org/data/definitions/119.html"
+                  }
+                ],
+                "severity": "HIGH",
+                "kind": "FAIL",
+                "tags": [
+                  "CWE-119"
+                ]
+              }
+            },
+            {
+              "id": "6705d439-af43-38cd-a04b-3292c3ad405c",
+              "name": "Detected Vulnerability in C Function (strlen)",
+              "helpUri": "https://www.glog.ai/",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe vulnerability in the provided C++ code snippet is related to the `strlen` function. The `strlen` function is used to calculate the length of a string, but it doesn't check for null termination. If the string is not null-terminated, `strlen` will continue reading until it encounters a null character, potentially leading to a buffer overflow vulnerability. This can lead to unexpected behavior, including program crashes, data corruption, and other security vulnerabilities.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, you should always ensure that your strings are null-terminated. This can be done by initializing your strings with a null character or by manually adding a null character at the end of your string. Additionally, you should avoid using functions that do not check for null termination, such as `strlen`, in favor of safer alternatives that do, such as `strnlen`.\n\n## Source Code Fix Recommendation\n\nHere is a fixed version of the provided code snippet:\n\n```cpp\n#include <cstdlib>\n#include <cstring>\n\nif ((atoi(argv[1]) > 0) && (atoi(argv[1]) < 65536) && (strnlen(argv[1], 7) < 7))\n```\n\nIn this version, `strnlen` is used instead of `strlen`. `strnlen` takes an additional parameter that specifies the maximum number of characters to read. This prevents `strnlen` from reading past the end of the string if it is not null-terminated.\n\n## Library Dependencies\n\nThe code snippet requires the following library dependencies:\n\n- `<cstdlib>`: This library provides functions for performing general functions, including conversion functions such as `atoi`.\n- `<cstring>`: This library provides functions for manipulating arrays of characters, including `strlen` and `strnlen`.\n\n## References\n\n- [OWASP C++ Secure Coding Practices](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n- [CWE-126: Buffer Over-read](https://cwe.mitre.org/data/definitions/126.html)"
+              },
+              "properties": {
+                "cwe": [
+                  {
+                    "id": "CWE-126",
+                    "url": "https://cwe.mitre.org/data/definitions/126.html"
+                  }
+                ],
+                "severity": "LOW",
+                "kind": "FAIL",
+                "tags": [
+                  "CWE-126"
+                ]
+              }
+            },
+            {
+              "id": "e7828855-98ed-3379-b683-56e26fb8b2f7",
+              "name": "\"Detected Use of Prohibited C Function (strcpy)\"",
+              "helpUri": "https://www.glog.ai/",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe `strcpy` function in C++ is a standard library function that copies a string. However, it does not check the size of the destination buffer, which can lead to buffer overflow if the source string is larger than the destination buffer. This can cause a program to crash or, in the worst case, allow an attacker to execute arbitrary code.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, you should always ensure that the destination buffer is large enough to hold the source string including the null-terminating character. This can be done by using safer alternatives to `strcpy` such as `strncpy`, `strlcpy` or `memcpy` which allow you to specify the maximum number of characters to be copied.\n\n## Source Code Fix Recommendation\n\nReplace the `strcpy` function with `strncpy` function:\n\n```cpp\nstrncpy(Buffer2S, Input, sizeof(Buffer2S) - 1);\nBuffer2S[sizeof(Buffer2S) - 1] = '\\0';\n```\n\n## Library Dependencies\n\nThe `strcpy` and `strncpy` functions are part of the C standard library, so you need to include the `cstring` header:\n\n```cpp\n#include <cstring>\n```\n\n## References\n\n- [OWASP C++ Secure Coding Practices](https://cheatsheetseries.owasp.org/cheatsheets/C-Based_Toolchain_Hardening_Cheat_Sheet.html)\n- [CWE-119: Improper Restriction of Operations within the Bounds of a Memory Buffer](https://cwe.mitre.org/data/definitions/119.html)"
+              },
+              "properties": {
+                "cwe": [
+                  {
+                    "id": "CWE-119",
+                    "url": "https://cwe.mitre.org/data/definitions/119.html"
+                  }
+                ],
+                "severity": "HIGH",
+                "kind": "FAIL",
+                "tags": [
+                  "CWE-119"
+                ]
+              }
             }
           ],
           "language": "en-US",
@@ -816,6 +784,78 @@
       },
       "language": "en-US",
       "results": [
+        {
+          "ruleId": "204d5341-e108-3d7e-afa8-0c011f249c3c",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Problematic C function detected (malloc)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "vulnserver.c"
+                },
+                "region": {
+                  "startLine": 237,
+                  "startColumn": 20,
+                  "endLine": 237,
+                  "endColumn": 31,
+                  "charOffset": 8792,
+                  "charLength": 11,
+                  "snippet": {
+                    "text": "malloc(180)",
+                    "rendered": {
+                      "text": "malloc(180)",
+                      "markdown": "`malloc(180)`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "glog-pfp-ruleFileLineCode/v1": "431be2c8372201539e9ebd8aacf069998c7af1f871c5dbe910e1203aef7225ad",
+            "glog-pfp-ruleFileCode/v1": "18880830423ec8d7eb6f3eeeec9a07c3dd23d080d549c0c68a67a75da81fb9a1"
+          },
+          "fingerprints": {
+            "glog-fp-ruleFileCode/v1": "18880830423ec8d7eb6f3eeeec9a07c3dd23d080d549c0c68a67a75da81fb9a1"
+          },
+          "fixes": [
+            {
+              "description": {
+                "text": "If the value provided to malloc is the result of unsafe integer math, it can result in an exploitable condition. "
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "vulnserver.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 8792,
+                        "charLength": 11
+                      },
+                      "insertedContent": {
+                        "text": "calloc(<number of elements>, <size of each element>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "BestPractice",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.ProblematicFunction"
+            ]
+          }
+        },
         {
           "ruleId": "0127b979-df44-378a-bdb6-783ae327914b",
           "kind": "fail",
@@ -1056,78 +1096,6 @@
           }
         },
         {
-          "ruleId": "204d5341-e108-3d7e-afa8-0c011f249c3c",
-          "kind": "fail",
-          "level": "note",
-          "message": {
-            "text": "Problematic C function detected (malloc)"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "vulnserver.c"
-                },
-                "region": {
-                  "startLine": 237,
-                  "startColumn": 20,
-                  "endLine": 237,
-                  "endColumn": 31,
-                  "charOffset": 8792,
-                  "charLength": 11,
-                  "snippet": {
-                    "text": "malloc(180)",
-                    "rendered": {
-                      "text": "malloc(180)",
-                      "markdown": "`malloc(180)`"
-                    }
-                  },
-                  "sourceLanguage": "c"
-                }
-              }
-            }
-          ],
-          "partialFingerprints": {
-            "glog-pfp-ruleFileLineCode/v1": "431be2c8372201539e9ebd8aacf069998c7af1f871c5dbe910e1203aef7225ad",
-            "glog-pfp-ruleFileCode/v1": "18880830423ec8d7eb6f3eeeec9a07c3dd23d080d549c0c68a67a75da81fb9a1"
-          },
-          "fingerprints": {
-            "glog-fp-ruleFileCode/v1": "18880830423ec8d7eb6f3eeeec9a07c3dd23d080d549c0c68a67a75da81fb9a1"
-          },
-          "fixes": [
-            {
-              "description": {
-                "text": "If the value provided to malloc is the result of unsafe integer math, it can result in an exploitable condition. "
-              },
-              "artifactChanges": [
-                {
-                  "artifactLocation": {
-                    "uri": "vulnserver.c"
-                  },
-                  "replacements": [
-                    {
-                      "deletedRegion": {
-                        "charOffset": 8792,
-                        "charLength": 11
-                      },
-                      "insertedContent": {
-                        "text": "calloc(<number of elements>, <size of each element>)"
-                      }
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
-          "properties": {
-            "DevSkimSeverity": "BestPractice",
-            "DevSkimConfidence": "High",
-            "tags": [
-              "API.DangerousAPI.ProblematicFunction"
-            ]
-          }
-        },
-        {
           "ruleId": "8341ea7f-9827-353f-a7ed-2cccc07d3f9c",
           "kind": "fail",
           "level": "note",
@@ -1184,6 +1152,101 @@
                       },
                       "insertedContent": {
                         "text": "calloc(<number of elements>, <size of each element>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "BestPractice",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.ProblematicFunction"
+            ]
+          }
+        },
+        {
+          "ruleId": "f05c6f2e-e052-3e35-8197-67a004aac604",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Detected Vulnerability in C Function (strlen)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "vulnserver.c"
+                },
+                "region": {
+                  "startLine": 220,
+                  "startColumn": 10,
+                  "endLine": 220,
+                  "endColumn": 25,
+                  "charOffset": 8145,
+                  "charLength": 15,
+                  "snippet": {
+                    "text": "strlen(RecvBuf)",
+                    "rendered": {
+                      "text": "strlen(RecvBuf)",
+                      "markdown": "`strlen(RecvBuf)`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "glog-pfp-ruleFileLineCode/v1": "3cf96020fdb623fd63f2ef1cd692ab761b8343bffb3d7b1b2744ad8555aa550a",
+            "glog-pfp-ruleFileCode/v1": "be3df871edbe0b29681507f6f2459af9ab40389630f817c153f7734d2cbb86f5"
+          },
+          "fingerprints": {
+            "glog-fp-ruleFileCode/v1": "be3df871edbe0b29681507f6f2459af9ab40389630f817c153f7734d2cbb86f5"
+          },
+          "fixes": [
+            {
+              "description": {
+                "text": "If a string is missing a null terminator, strlen will read past the end of the buffer"
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "vulnserver.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 8145,
+                        "charLength": 15
+                      },
+                      "insertedContent": {
+                        "text": "strlen_s(RecvBuf, <size of RecvBuf>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "description": {
+                "text": "If a string is missing a null terminator, strlen will read past the end of the buffer"
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "vulnserver.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 8145,
+                        "charLength": 15
+                      },
+                      "insertedContent": {
+                        "text": "strnlen(RecvBuf, <size of RecvBuf>)"
                       }
                     }
                   ]
@@ -1390,6 +1453,78 @@
           }
         },
         {
+          "ruleId": "f9510372-e5da-3451-ad80-db59705ab582",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Problematic C function detected (malloc)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "vulnserver.c"
+                },
+                "region": {
+                  "startLine": 205,
+                  "startColumn": 20,
+                  "endLine": 205,
+                  "endColumn": 32,
+                  "charOffset": 7643,
+                  "charLength": 12,
+                  "snippet": {
+                    "text": "malloc(3000)",
+                    "rendered": {
+                      "text": "malloc(3000)",
+                      "markdown": "`malloc(3000)`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "glog-pfp-ruleFileLineCode/v1": "3456cb8120e6ab2925acc91b1e6ffc083bde7727b68daaf4b3fab59ddcaf7f51",
+            "glog-pfp-ruleFileCode/v1": "63e7db75db78e69c2bb7efd9ed059c6be339d929f8b23e0847c300ce12630e53"
+          },
+          "fingerprints": {
+            "glog-fp-ruleFileCode/v1": "63e7db75db78e69c2bb7efd9ed059c6be339d929f8b23e0847c300ce12630e53"
+          },
+          "fixes": [
+            {
+              "description": {
+                "text": "If the value provided to malloc is the result of unsafe integer math, it can result in an exploitable condition. "
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "vulnserver.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 7643,
+                        "charLength": 12
+                      },
+                      "insertedContent": {
+                        "text": "calloc(<number of elements>, <size of each element>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "BestPractice",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.ProblematicFunction"
+            ]
+          }
+        },
+        {
           "ruleId": "c9ddf4c3-28f1-3b22-9980-2a468666ae02",
           "kind": "fail",
           "level": "error",
@@ -1485,7 +1620,7 @@
           }
         },
         {
-          "ruleId": "f9510372-e5da-3451-ad80-db59705ab582",
+          "ruleId": "9df085a5-2a9b-3980-8f79-edc1f1c621b9",
           "kind": "fail",
           "level": "note",
           "message": {
@@ -1498,17 +1633,17 @@
                   "uri": "vulnserver.c"
                 },
                 "region": {
-                  "startLine": 205,
+                  "startLine": 200,
                   "startColumn": 20,
-                  "endLine": 205,
-                  "endColumn": 32,
-                  "charOffset": 7643,
-                  "charLength": 12,
+                  "endLine": 200,
+                  "endColumn": 31,
+                  "charOffset": 7430,
+                  "charLength": 11,
                   "snippet": {
-                    "text": "malloc(3000)",
+                    "text": "malloc(120)",
                     "rendered": {
-                      "text": "malloc(3000)",
-                      "markdown": "`malloc(3000)`"
+                      "text": "malloc(120)",
+                      "markdown": "`malloc(120)`"
                     }
                   },
                   "sourceLanguage": "c"
@@ -1517,11 +1652,11 @@
             }
           ],
           "partialFingerprints": {
-            "glog-pfp-ruleFileLineCode/v1": "3456cb8120e6ab2925acc91b1e6ffc083bde7727b68daaf4b3fab59ddcaf7f51",
-            "glog-pfp-ruleFileCode/v1": "63e7db75db78e69c2bb7efd9ed059c6be339d929f8b23e0847c300ce12630e53"
+            "glog-pfp-ruleFileLineCode/v1": "427746302810f44684748068aeca51f5247eaf6f38fa2996e64f8f2f72f363ae",
+            "glog-pfp-ruleFileCode/v1": "4cabdd1590f3cf2698c57f2c96a9df651e0b0b8ac1331c3c892ec39967caae0b"
           },
           "fingerprints": {
-            "glog-fp-ruleFileCode/v1": "63e7db75db78e69c2bb7efd9ed059c6be339d929f8b23e0847c300ce12630e53"
+            "glog-fp-ruleFileCode/v1": "4cabdd1590f3cf2698c57f2c96a9df651e0b0b8ac1331c3c892ec39967caae0b"
           },
           "fixes": [
             {
@@ -1536,8 +1671,8 @@
                   "replacements": [
                     {
                       "deletedRegion": {
-                        "charOffset": 7643,
-                        "charLength": 12
+                        "charOffset": 7430,
+                        "charLength": 11
                       },
                       "insertedContent": {
                         "text": "calloc(<number of elements>, <size of each element>)"
@@ -1652,7 +1787,7 @@
           }
         },
         {
-          "ruleId": "9df085a5-2a9b-3980-8f79-edc1f1c621b9",
+          "ruleId": "8e47a262-2390-39df-8576-3fdbe1b22973",
           "kind": "fail",
           "level": "note",
           "message": {
@@ -1665,11 +1800,11 @@
                   "uri": "vulnserver.c"
                 },
                 "region": {
-                  "startLine": 200,
-                  "startColumn": 20,
-                  "endLine": 200,
-                  "endColumn": 31,
-                  "charOffset": 7430,
+                  "startLine": 195,
+                  "startColumn": 21,
+                  "endLine": 195,
+                  "endColumn": 32,
+                  "charOffset": 7204,
                   "charLength": 11,
                   "snippet": {
                     "text": "malloc(120)",
@@ -1684,11 +1819,11 @@
             }
           ],
           "partialFingerprints": {
-            "glog-pfp-ruleFileLineCode/v1": "427746302810f44684748068aeca51f5247eaf6f38fa2996e64f8f2f72f363ae",
-            "glog-pfp-ruleFileCode/v1": "4cabdd1590f3cf2698c57f2c96a9df651e0b0b8ac1331c3c892ec39967caae0b"
+            "glog-pfp-ruleFileLineCode/v1": "ff114c388dc80d9547e48c1cafd80faeb23a9ebd21a593dd1a0dfca1e41cc064",
+            "glog-pfp-ruleFileCode/v1": "2711a72bfe4d32a88d86bd9ada069e2a215b178514157f8f5c802285563ab532"
           },
           "fingerprints": {
-            "glog-fp-ruleFileCode/v1": "4cabdd1590f3cf2698c57f2c96a9df651e0b0b8ac1331c3c892ec39967caae0b"
+            "glog-fp-ruleFileCode/v1": "2711a72bfe4d32a88d86bd9ada069e2a215b178514157f8f5c802285563ab532"
           },
           "fixes": [
             {
@@ -1703,7 +1838,7 @@
                   "replacements": [
                     {
                       "deletedRegion": {
-                        "charOffset": 7430,
+                        "charOffset": 7204,
                         "charLength": 11
                       },
                       "insertedContent": {
@@ -1815,78 +1950,6 @@
             "DevSkimConfidence": "High",
             "tags": [
               "API.DangerousAPI.BannedFunction"
-            ]
-          }
-        },
-        {
-          "ruleId": "8e47a262-2390-39df-8576-3fdbe1b22973",
-          "kind": "fail",
-          "level": "note",
-          "message": {
-            "text": "Problematic C function detected (malloc)"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "vulnserver.c"
-                },
-                "region": {
-                  "startLine": 195,
-                  "startColumn": 21,
-                  "endLine": 195,
-                  "endColumn": 32,
-                  "charOffset": 7204,
-                  "charLength": 11,
-                  "snippet": {
-                    "text": "malloc(120)",
-                    "rendered": {
-                      "text": "malloc(120)",
-                      "markdown": "`malloc(120)`"
-                    }
-                  },
-                  "sourceLanguage": "c"
-                }
-              }
-            }
-          ],
-          "partialFingerprints": {
-            "glog-pfp-ruleFileLineCode/v1": "ff114c388dc80d9547e48c1cafd80faeb23a9ebd21a593dd1a0dfca1e41cc064",
-            "glog-pfp-ruleFileCode/v1": "2711a72bfe4d32a88d86bd9ada069e2a215b178514157f8f5c802285563ab532"
-          },
-          "fingerprints": {
-            "glog-fp-ruleFileCode/v1": "2711a72bfe4d32a88d86bd9ada069e2a215b178514157f8f5c802285563ab532"
-          },
-          "fixes": [
-            {
-              "description": {
-                "text": "If the value provided to malloc is the result of unsafe integer math, it can result in an exploitable condition. "
-              },
-              "artifactChanges": [
-                {
-                  "artifactLocation": {
-                    "uri": "vulnserver.c"
-                  },
-                  "replacements": [
-                    {
-                      "deletedRegion": {
-                        "charOffset": 7204,
-                        "charLength": 11
-                      },
-                      "insertedContent": {
-                        "text": "calloc(<number of elements>, <size of each element>)"
-                      }
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
-          "properties": {
-            "DevSkimSeverity": "BestPractice",
-            "DevSkimConfidence": "High",
-            "tags": [
-              "API.DangerousAPI.ProblematicFunction"
             ]
           }
         },
@@ -2225,78 +2288,6 @@
           }
         },
         {
-          "ruleId": "779b311e-3a70-3dff-9195-15fe204465ff",
-          "kind": "fail",
-          "level": "note",
-          "message": {
-            "text": "Problematic C function detected (malloc)"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "vulnserver.c"
-                },
-                "region": {
-                  "startLine": 164,
-                  "startColumn": 17,
-                  "endLine": 164,
-                  "endColumn": 29,
-                  "charOffset": 5564,
-                  "charLength": 12,
-                  "snippet": {
-                    "text": "malloc(1024)",
-                    "rendered": {
-                      "text": "malloc(1024)",
-                      "markdown": "`malloc(1024)`"
-                    }
-                  },
-                  "sourceLanguage": "c"
-                }
-              }
-            }
-          ],
-          "partialFingerprints": {
-            "glog-pfp-ruleFileLineCode/v1": "f84dc35c1099967cba0f9dd9a91f4e633b7de65326a345ed0f6de7d85a95277c",
-            "glog-pfp-ruleFileCode/v1": "f9e67dce10dcba00769757db671dc76acd2273ca9fdd9ab6433fbc1cf23996f0"
-          },
-          "fingerprints": {
-            "glog-fp-ruleFileCode/v1": "f9e67dce10dcba00769757db671dc76acd2273ca9fdd9ab6433fbc1cf23996f0"
-          },
-          "fixes": [
-            {
-              "description": {
-                "text": "If the value provided to malloc is the result of unsafe integer math, it can result in an exploitable condition. "
-              },
-              "artifactChanges": [
-                {
-                  "artifactLocation": {
-                    "uri": "vulnserver.c"
-                  },
-                  "replacements": [
-                    {
-                      "deletedRegion": {
-                        "charOffset": 5564,
-                        "charLength": 12
-                      },
-                      "insertedContent": {
-                        "text": "calloc(<number of elements>, <size of each element>)"
-                      }
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
-          "properties": {
-            "DevSkimSeverity": "BestPractice",
-            "DevSkimConfidence": "High",
-            "tags": [
-              "API.DangerousAPI.ProblematicFunction"
-            ]
-          }
-        },
-        {
           "ruleId": "bc04a9f8-4196-3744-99f1-4455de62ffc7",
           "kind": "fail",
           "level": "note",
@@ -2369,11 +2360,11 @@
           }
         },
         {
-          "ruleId": "f05c6f2e-e052-3e35-8197-67a004aac604",
+          "ruleId": "779b311e-3a70-3dff-9195-15fe204465ff",
           "kind": "fail",
           "level": "note",
           "message": {
-            "text": "Detected Vulnerability in C Function (strlen)"
+            "text": "Problematic C function detected (malloc)"
           },
           "locations": [
             {
@@ -2382,17 +2373,17 @@
                   "uri": "vulnserver.c"
                 },
                 "region": {
-                  "startLine": 220,
-                  "startColumn": 10,
-                  "endLine": 220,
-                  "endColumn": 25,
-                  "charOffset": 8145,
-                  "charLength": 15,
+                  "startLine": 164,
+                  "startColumn": 17,
+                  "endLine": 164,
+                  "endColumn": 29,
+                  "charOffset": 5564,
+                  "charLength": 12,
                   "snippet": {
-                    "text": "strlen(RecvBuf)",
+                    "text": "malloc(1024)",
                     "rendered": {
-                      "text": "strlen(RecvBuf)",
-                      "markdown": "`strlen(RecvBuf)`"
+                      "text": "malloc(1024)",
+                      "markdown": "`malloc(1024)`"
                     }
                   },
                   "sourceLanguage": "c"
@@ -2401,16 +2392,16 @@
             }
           ],
           "partialFingerprints": {
-            "glog-pfp-ruleFileLineCode/v1": "3cf96020fdb623fd63f2ef1cd692ab761b8343bffb3d7b1b2744ad8555aa550a",
-            "glog-pfp-ruleFileCode/v1": "be3df871edbe0b29681507f6f2459af9ab40389630f817c153f7734d2cbb86f5"
+            "glog-pfp-ruleFileLineCode/v1": "f84dc35c1099967cba0f9dd9a91f4e633b7de65326a345ed0f6de7d85a95277c",
+            "glog-pfp-ruleFileCode/v1": "f9e67dce10dcba00769757db671dc76acd2273ca9fdd9ab6433fbc1cf23996f0"
           },
           "fingerprints": {
-            "glog-fp-ruleFileCode/v1": "be3df871edbe0b29681507f6f2459af9ab40389630f817c153f7734d2cbb86f5"
+            "glog-fp-ruleFileCode/v1": "f9e67dce10dcba00769757db671dc76acd2273ca9fdd9ab6433fbc1cf23996f0"
           },
           "fixes": [
             {
               "description": {
-                "text": "If a string is missing a null terminator, strlen will read past the end of the buffer"
+                "text": "If the value provided to malloc is the result of unsafe integer math, it can result in an exploitable condition. "
               },
               "artifactChanges": [
                 {
@@ -2420,34 +2411,11 @@
                   "replacements": [
                     {
                       "deletedRegion": {
-                        "charOffset": 8145,
-                        "charLength": 15
+                        "charOffset": 5564,
+                        "charLength": 12
                       },
                       "insertedContent": {
-                        "text": "strlen_s(RecvBuf, <size of RecvBuf>)"
-                      }
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "description": {
-                "text": "If a string is missing a null terminator, strlen will read past the end of the buffer"
-              },
-              "artifactChanges": [
-                {
-                  "artifactLocation": {
-                    "uri": "vulnserver.c"
-                  },
-                  "replacements": [
-                    {
-                      "deletedRegion": {
-                        "charOffset": 8145,
-                        "charLength": 15
-                      },
-                      "insertedContent": {
-                        "text": "strnlen(RecvBuf, <size of RecvBuf>)"
+                        "text": "calloc(<number of elements>, <size of each element>)"
                       }
                     }
                   ]
@@ -2460,386 +2428,6 @@
             "DevSkimConfidence": "High",
             "tags": [
               "API.DangerousAPI.ProblematicFunction"
-            ]
-          }
-        },
-        {
-          "ruleId": "351e52ca-5a28-3fc9-8e22-067967c5228e",
-          "kind": "fail",
-          "level": "error",
-          "message": {
-            "text": "\"Detected Use of Prohibited C Function (strcpy)\""
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "vulnserver.c"
-                },
-                "region": {
-                  "startLine": 146,
-                  "startColumn": 1,
-                  "endLine": 146,
-                  "endColumn": 24,
-                  "charOffset": 5191,
-                  "charLength": 23,
-                  "snippet": {
-                    "text": "strcpy(Buffer2S, Input)",
-                    "rendered": {
-                      "text": "strcpy(Buffer2S, Input)",
-                      "markdown": "`strcpy(Buffer2S, Input)`"
-                    }
-                  },
-                  "sourceLanguage": "c"
-                }
-              }
-            }
-          ],
-          "partialFingerprints": {
-            "glog-pfp-ruleFileLineCode/v1": "ef611198c3d59b8e3920e7c8bc0ae3411919210fcf051eadebe58d2de568b900",
-            "glog-pfp-ruleFileCode/v1": "d8023c6fb0168645c4e0f9413d6f0dfeeaaf972b6c09427a0656db09622f34bc"
-          },
-          "fingerprints": {
-            "glog-fp-ruleFileCode/v1": "d8023c6fb0168645c4e0f9413d6f0dfeeaaf972b6c09427a0656db09622f34bc"
-          },
-          "fixes": [
-            {
-              "description": {
-                "text": "strcpy is frequently dangerous, as it will cause a buffer overflow if the source is larger than the destination."
-              },
-              "artifactChanges": [
-                {
-                  "artifactLocation": {
-                    "uri": "vulnserver.c"
-                  },
-                  "replacements": [
-                    {
-                      "deletedRegion": {
-                        "charOffset": 5191,
-                        "charLength": 23
-                      },
-                      "insertedContent": {
-                        "text": "strcpy_s(Buffer2S, <size of Buffer2S>,  Input)"
-                      }
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "description": {
-                "text": "strcpy is frequently dangerous, as it will cause a buffer overflow if the source is larger than the destination."
-              },
-              "artifactChanges": [
-                {
-                  "artifactLocation": {
-                    "uri": "vulnserver.c"
-                  },
-                  "replacements": [
-                    {
-                      "deletedRegion": {
-                        "charOffset": 5191,
-                        "charLength": 23
-                      },
-                      "insertedContent": {
-                        "text": "strlcpy(Buffer2S,  Input, <size of Buffer2S>)"
-                      }
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
-          "properties": {
-            "DevSkimSeverity": "Important",
-            "DevSkimConfidence": "High",
-            "tags": [
-              "API.DangerousAPI.BannedFunction"
-            ]
-          }
-        },
-        {
-          "ruleId": "e12227ce-fae1-396e-8449-e82f9bc49eb0",
-          "kind": "fail",
-          "level": "error",
-          "message": {
-            "text": "\"Detected Use of Prohibited C Function (strcpy)\""
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "essfunc.c"
-                },
-                "region": {
-                  "startLine": 117,
-                  "startColumn": 1,
-                  "endLine": 117,
-                  "endColumn": 24,
-                  "charOffset": 3225,
-                  "charLength": 23,
-                  "snippet": {
-                    "text": "strcpy(Buffer2S, Input)",
-                    "rendered": {
-                      "text": "strcpy(Buffer2S, Input)",
-                      "markdown": "`strcpy(Buffer2S, Input)`"
-                    }
-                  },
-                  "sourceLanguage": "c"
-                }
-              }
-            }
-          ],
-          "partialFingerprints": {
-            "glog-pfp-ruleFileLineCode/v1": "fe32de21c3a144381fe3e9a67b1f439469056c30b89cca29324aec34a10f6a66",
-            "glog-pfp-ruleFileCode/v1": "fefeb1e894593429ddb0802beede5661618558b89f854db0daa4096ca332899c"
-          },
-          "fingerprints": {
-            "glog-fp-ruleFileCode/v1": "fefeb1e894593429ddb0802beede5661618558b89f854db0daa4096ca332899c"
-          },
-          "fixes": [
-            {
-              "description": {
-                "text": "strcpy is frequently dangerous, as it will cause a buffer overflow if the source is larger than the destination."
-              },
-              "artifactChanges": [
-                {
-                  "artifactLocation": {
-                    "uri": "essfunc.c"
-                  },
-                  "replacements": [
-                    {
-                      "deletedRegion": {
-                        "charOffset": 3225,
-                        "charLength": 23
-                      },
-                      "insertedContent": {
-                        "text": "strcpy_s(Buffer2S, <size of Buffer2S>,  Input)"
-                      }
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "description": {
-                "text": "strcpy is frequently dangerous, as it will cause a buffer overflow if the source is larger than the destination."
-              },
-              "artifactChanges": [
-                {
-                  "artifactLocation": {
-                    "uri": "essfunc.c"
-                  },
-                  "replacements": [
-                    {
-                      "deletedRegion": {
-                        "charOffset": 3225,
-                        "charLength": 23
-                      },
-                      "insertedContent": {
-                        "text": "strlcpy(Buffer2S,  Input, <size of Buffer2S>)"
-                      }
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
-          "properties": {
-            "DevSkimSeverity": "Important",
-            "DevSkimConfidence": "High",
-            "tags": [
-              "API.DangerousAPI.BannedFunction"
-            ]
-          }
-        },
-        {
-          "ruleId": "672f9062-60ac-3120-9b88-7b8ab22448ba",
-          "kind": "fail",
-          "level": "error",
-          "message": {
-            "text": "\"Detected Use of Prohibited C Function (strcpy)\""
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "essfunc.c"
-                },
-                "region": {
-                  "startLine": 112,
-                  "startColumn": 1,
-                  "endLine": 112,
-                  "endColumn": 24,
-                  "charOffset": 3133,
-                  "charLength": 23,
-                  "snippet": {
-                    "text": "strcpy(Buffer2S, Input)",
-                    "rendered": {
-                      "text": "strcpy(Buffer2S, Input)",
-                      "markdown": "`strcpy(Buffer2S, Input)`"
-                    }
-                  },
-                  "sourceLanguage": "c"
-                }
-              }
-            }
-          ],
-          "partialFingerprints": {
-            "glog-pfp-ruleFileLineCode/v1": "7d5a43e4e5131540477015518650dd0514a144eb4dcfb754376958611ea39a23",
-            "glog-pfp-ruleFileCode/v1": "d35f9e84f20917ee059f86d3df9b5e5a604f51d5b259946f6267464c4f9079e5"
-          },
-          "fingerprints": {
-            "glog-fp-ruleFileCode/v1": "d35f9e84f20917ee059f86d3df9b5e5a604f51d5b259946f6267464c4f9079e5"
-          },
-          "fixes": [
-            {
-              "description": {
-                "text": "strcpy is frequently dangerous, as it will cause a buffer overflow if the source is larger than the destination."
-              },
-              "artifactChanges": [
-                {
-                  "artifactLocation": {
-                    "uri": "essfunc.c"
-                  },
-                  "replacements": [
-                    {
-                      "deletedRegion": {
-                        "charOffset": 3133,
-                        "charLength": 23
-                      },
-                      "insertedContent": {
-                        "text": "strcpy_s(Buffer2S, <size of Buffer2S>,  Input)"
-                      }
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "description": {
-                "text": "strcpy is frequently dangerous, as it will cause a buffer overflow if the source is larger than the destination."
-              },
-              "artifactChanges": [
-                {
-                  "artifactLocation": {
-                    "uri": "essfunc.c"
-                  },
-                  "replacements": [
-                    {
-                      "deletedRegion": {
-                        "charOffset": 3133,
-                        "charLength": 23
-                      },
-                      "insertedContent": {
-                        "text": "strlcpy(Buffer2S,  Input, <size of Buffer2S>)"
-                      }
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
-          "properties": {
-            "DevSkimSeverity": "Important",
-            "DevSkimConfidence": "High",
-            "tags": [
-              "API.DangerousAPI.BannedFunction"
-            ]
-          }
-        },
-        {
-          "ruleId": "1519f623-a5cd-3a1f-8045-572420349f8a",
-          "kind": "fail",
-          "level": "error",
-          "message": {
-            "text": "Banned C function detected (strncpy)"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "vulnserver.c"
-                },
-                "region": {
-                  "startLine": 58,
-                  "startColumn": 2,
-                  "endLine": 58,
-                  "endColumn": 38,
-                  "charOffset": 2751,
-                  "charLength": 36,
-                  "snippet": {
-                    "text": "strncpy(PortNumber, DEFAULT_PORT, 6)",
-                    "rendered": {
-                      "text": "strncpy(PortNumber, DEFAULT_PORT, 6)",
-                      "markdown": "`strncpy(PortNumber, DEFAULT_PORT, 6)`"
-                    }
-                  },
-                  "sourceLanguage": "c"
-                }
-              }
-            }
-          ],
-          "partialFingerprints": {
-            "glog-pfp-ruleFileLineCode/v1": "1d768849ef2e773bd1bd5cc423299c72403903ba2a11572d7be289299c1a72ff",
-            "glog-pfp-ruleFileCode/v1": "22d26320ef212314c6541bf4f08ab4ebffbd1f99ecb25567342566db88e16325"
-          },
-          "fingerprints": {
-            "glog-fp-ruleFileCode/v1": "22d26320ef212314c6541bf4f08ab4ebffbd1f99ecb25567342566db88e16325"
-          },
-          "fixes": [
-            {
-              "description": {
-                "text": "strncpy is dangerous, as if the source contains 'n' or more characters, it will not null terminate the destination."
-              },
-              "artifactChanges": [
-                {
-                  "artifactLocation": {
-                    "uri": "vulnserver.c"
-                  },
-                  "replacements": [
-                    {
-                      "deletedRegion": {
-                        "charOffset": 2751,
-                        "charLength": 36
-                      },
-                      "insertedContent": {
-                        "text": "strcpy_s(PortNumber,  6,  DEFAULT_PORT)"
-                      }
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "description": {
-                "text": "strncpy is dangerous, as if the source contains 'n' or more characters, it will not null terminate the destination."
-              },
-              "artifactChanges": [
-                {
-                  "artifactLocation": {
-                    "uri": "vulnserver.c"
-                  },
-                  "replacements": [
-                    {
-                      "deletedRegion": {
-                        "charOffset": 2751,
-                        "charLength": 36
-                      },
-                      "insertedContent": {
-                        "text": "strlcpy(PortNumber,  DEFAULT_PORT,  6)"
-                      }
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
-          "properties": {
-            "DevSkimSeverity": "Important",
-            "DevSkimConfidence": "High",
-            "tags": [
-              "API.DangerousAPI.BannedFunction"
             ]
           }
         },
@@ -3034,196 +2622,6 @@
           }
         },
         {
-          "ruleId": "00448155-e255-3e9d-ab46-8b62dea81a76",
-          "kind": "fail",
-          "level": "error",
-          "message": {
-            "text": "\"Detected Use of Prohibited C Function (strcpy)\""
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "essfunc.c"
-                },
-                "region": {
-                  "startLine": 100,
-                  "startColumn": 1,
-                  "endLine": 100,
-                  "endColumn": 24,
-                  "charOffset": 2908,
-                  "charLength": 23,
-                  "snippet": {
-                    "text": "strcpy(Buffer2S, Input)",
-                    "rendered": {
-                      "text": "strcpy(Buffer2S, Input)",
-                      "markdown": "`strcpy(Buffer2S, Input)`"
-                    }
-                  },
-                  "sourceLanguage": "c"
-                }
-              }
-            }
-          ],
-          "partialFingerprints": {
-            "glog-pfp-ruleFileLineCode/v1": "7ad8c3d05573ce068e1f1778be696f2f41ada77faf9c27ea9d324dd2a6026f1a",
-            "glog-pfp-ruleFileCode/v1": "0014eb5fbc7317503d8f19c9edd530a13bfb07d19e8805543587d624e507f924"
-          },
-          "fingerprints": {
-            "glog-fp-ruleFileCode/v1": "0014eb5fbc7317503d8f19c9edd530a13bfb07d19e8805543587d624e507f924"
-          },
-          "fixes": [
-            {
-              "description": {
-                "text": "strcpy is frequently dangerous, as it will cause a buffer overflow if the source is larger than the destination."
-              },
-              "artifactChanges": [
-                {
-                  "artifactLocation": {
-                    "uri": "essfunc.c"
-                  },
-                  "replacements": [
-                    {
-                      "deletedRegion": {
-                        "charOffset": 2908,
-                        "charLength": 23
-                      },
-                      "insertedContent": {
-                        "text": "strcpy_s(Buffer2S, <size of Buffer2S>,  Input)"
-                      }
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "description": {
-                "text": "strcpy is frequently dangerous, as it will cause a buffer overflow if the source is larger than the destination."
-              },
-              "artifactChanges": [
-                {
-                  "artifactLocation": {
-                    "uri": "essfunc.c"
-                  },
-                  "replacements": [
-                    {
-                      "deletedRegion": {
-                        "charOffset": 2908,
-                        "charLength": 23
-                      },
-                      "insertedContent": {
-                        "text": "strlcpy(Buffer2S,  Input, <size of Buffer2S>)"
-                      }
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
-          "properties": {
-            "DevSkimSeverity": "Important",
-            "DevSkimConfidence": "High",
-            "tags": [
-              "API.DangerousAPI.BannedFunction"
-            ]
-          }
-        },
-        {
-          "ruleId": "e7828855-98ed-3379-b683-56e26fb8b2f7",
-          "kind": "fail",
-          "level": "error",
-          "message": {
-            "text": "\"Detected Use of Prohibited C Function (strcpy)\""
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "essfunc.c"
-                },
-                "region": {
-                  "startLine": 95,
-                  "startColumn": 1,
-                  "endLine": 95,
-                  "endColumn": 24,
-                  "charOffset": 2818,
-                  "charLength": 23,
-                  "snippet": {
-                    "text": "strcpy(Buffer2S, Input)",
-                    "rendered": {
-                      "text": "strcpy(Buffer2S, Input)",
-                      "markdown": "`strcpy(Buffer2S, Input)`"
-                    }
-                  },
-                  "sourceLanguage": "c"
-                }
-              }
-            }
-          ],
-          "partialFingerprints": {
-            "glog-pfp-ruleFileLineCode/v1": "58232a0a52849d26ed2c074de130a78a4e345baa9b50d2a773bdd658be910bf0",
-            "glog-pfp-ruleFileCode/v1": "7ca43a963051f01a8aac68131fc543d24ef74670a98641156535821a645b6738"
-          },
-          "fingerprints": {
-            "glog-fp-ruleFileCode/v1": "7ca43a963051f01a8aac68131fc543d24ef74670a98641156535821a645b6738"
-          },
-          "fixes": [
-            {
-              "description": {
-                "text": "strcpy is frequently dangerous, as it will cause a buffer overflow if the source is larger than the destination."
-              },
-              "artifactChanges": [
-                {
-                  "artifactLocation": {
-                    "uri": "essfunc.c"
-                  },
-                  "replacements": [
-                    {
-                      "deletedRegion": {
-                        "charOffset": 2818,
-                        "charLength": 23
-                      },
-                      "insertedContent": {
-                        "text": "strcpy_s(Buffer2S, <size of Buffer2S>,  Input)"
-                      }
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "description": {
-                "text": "strcpy is frequently dangerous, as it will cause a buffer overflow if the source is larger than the destination."
-              },
-              "artifactChanges": [
-                {
-                  "artifactLocation": {
-                    "uri": "essfunc.c"
-                  },
-                  "replacements": [
-                    {
-                      "deletedRegion": {
-                        "charOffset": 2818,
-                        "charLength": 23
-                      },
-                      "insertedContent": {
-                        "text": "strlcpy(Buffer2S,  Input, <size of Buffer2S>)"
-                      }
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
-          "properties": {
-            "DevSkimSeverity": "Important",
-            "DevSkimConfidence": "High",
-            "tags": [
-              "API.DangerousAPI.BannedFunction"
-            ]
-          }
-        },
-        {
           "ruleId": "74e668dd-79a8-3ff9-80f2-d72df568bbc8",
           "kind": "fail",
           "level": "error",
@@ -3299,6 +2697,386 @@
                     {
                       "deletedRegion": {
                         "charOffset": 5107,
+                        "charLength": 23
+                      },
+                      "insertedContent": {
+                        "text": "strlcpy(Buffer2S,  Input, <size of Buffer2S>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.BannedFunction"
+            ]
+          }
+        },
+        {
+          "ruleId": "351e52ca-5a28-3fc9-8e22-067967c5228e",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "\"Detected Use of Prohibited C Function (strcpy)\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "vulnserver.c"
+                },
+                "region": {
+                  "startLine": 146,
+                  "startColumn": 1,
+                  "endLine": 146,
+                  "endColumn": 24,
+                  "charOffset": 5191,
+                  "charLength": 23,
+                  "snippet": {
+                    "text": "strcpy(Buffer2S, Input)",
+                    "rendered": {
+                      "text": "strcpy(Buffer2S, Input)",
+                      "markdown": "`strcpy(Buffer2S, Input)`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "glog-pfp-ruleFileLineCode/v1": "ef611198c3d59b8e3920e7c8bc0ae3411919210fcf051eadebe58d2de568b900",
+            "glog-pfp-ruleFileCode/v1": "d8023c6fb0168645c4e0f9413d6f0dfeeaaf972b6c09427a0656db09622f34bc"
+          },
+          "fingerprints": {
+            "glog-fp-ruleFileCode/v1": "d8023c6fb0168645c4e0f9413d6f0dfeeaaf972b6c09427a0656db09622f34bc"
+          },
+          "fixes": [
+            {
+              "description": {
+                "text": "strcpy is frequently dangerous, as it will cause a buffer overflow if the source is larger than the destination."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "vulnserver.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 5191,
+                        "charLength": 23
+                      },
+                      "insertedContent": {
+                        "text": "strcpy_s(Buffer2S, <size of Buffer2S>,  Input)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "description": {
+                "text": "strcpy is frequently dangerous, as it will cause a buffer overflow if the source is larger than the destination."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "vulnserver.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 5191,
+                        "charLength": 23
+                      },
+                      "insertedContent": {
+                        "text": "strlcpy(Buffer2S,  Input, <size of Buffer2S>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.BannedFunction"
+            ]
+          }
+        },
+        {
+          "ruleId": "e12227ce-fae1-396e-8449-e82f9bc49eb0",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "\"Detected Use of Prohibited C Function (strcpy)\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "essfunc.c"
+                },
+                "region": {
+                  "startLine": 117,
+                  "startColumn": 1,
+                  "endLine": 117,
+                  "endColumn": 24,
+                  "charOffset": 3225,
+                  "charLength": 23,
+                  "snippet": {
+                    "text": "strcpy(Buffer2S, Input)",
+                    "rendered": {
+                      "text": "strcpy(Buffer2S, Input)",
+                      "markdown": "`strcpy(Buffer2S, Input)`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "glog-pfp-ruleFileLineCode/v1": "fe32de21c3a144381fe3e9a67b1f439469056c30b89cca29324aec34a10f6a66",
+            "glog-pfp-ruleFileCode/v1": "fefeb1e894593429ddb0802beede5661618558b89f854db0daa4096ca332899c"
+          },
+          "fingerprints": {
+            "glog-fp-ruleFileCode/v1": "fefeb1e894593429ddb0802beede5661618558b89f854db0daa4096ca332899c"
+          },
+          "fixes": [
+            {
+              "description": {
+                "text": "strcpy is frequently dangerous, as it will cause a buffer overflow if the source is larger than the destination."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "essfunc.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 3225,
+                        "charLength": 23
+                      },
+                      "insertedContent": {
+                        "text": "strcpy_s(Buffer2S, <size of Buffer2S>,  Input)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "description": {
+                "text": "strcpy is frequently dangerous, as it will cause a buffer overflow if the source is larger than the destination."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "essfunc.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 3225,
+                        "charLength": 23
+                      },
+                      "insertedContent": {
+                        "text": "strlcpy(Buffer2S,  Input, <size of Buffer2S>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.BannedFunction"
+            ]
+          }
+        },
+        {
+          "ruleId": "1519f623-a5cd-3a1f-8045-572420349f8a",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Banned C function detected (strncpy)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "vulnserver.c"
+                },
+                "region": {
+                  "startLine": 58,
+                  "startColumn": 2,
+                  "endLine": 58,
+                  "endColumn": 38,
+                  "charOffset": 2751,
+                  "charLength": 36,
+                  "snippet": {
+                    "text": "strncpy(PortNumber, DEFAULT_PORT, 6)",
+                    "rendered": {
+                      "text": "strncpy(PortNumber, DEFAULT_PORT, 6)",
+                      "markdown": "`strncpy(PortNumber, DEFAULT_PORT, 6)`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "glog-pfp-ruleFileLineCode/v1": "1d768849ef2e773bd1bd5cc423299c72403903ba2a11572d7be289299c1a72ff",
+            "glog-pfp-ruleFileCode/v1": "22d26320ef212314c6541bf4f08ab4ebffbd1f99ecb25567342566db88e16325"
+          },
+          "fingerprints": {
+            "glog-fp-ruleFileCode/v1": "22d26320ef212314c6541bf4f08ab4ebffbd1f99ecb25567342566db88e16325"
+          },
+          "fixes": [
+            {
+              "description": {
+                "text": "strncpy is dangerous, as if the source contains 'n' or more characters, it will not null terminate the destination."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "vulnserver.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 2751,
+                        "charLength": 36
+                      },
+                      "insertedContent": {
+                        "text": "strcpy_s(PortNumber,  6,  DEFAULT_PORT)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "description": {
+                "text": "strncpy is dangerous, as if the source contains 'n' or more characters, it will not null terminate the destination."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "vulnserver.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 2751,
+                        "charLength": 36
+                      },
+                      "insertedContent": {
+                        "text": "strlcpy(PortNumber,  DEFAULT_PORT,  6)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.BannedFunction"
+            ]
+          }
+        },
+        {
+          "ruleId": "672f9062-60ac-3120-9b88-7b8ab22448ba",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "\"Detected Use of Prohibited C Function (strcpy)\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "essfunc.c"
+                },
+                "region": {
+                  "startLine": 112,
+                  "startColumn": 1,
+                  "endLine": 112,
+                  "endColumn": 24,
+                  "charOffset": 3133,
+                  "charLength": 23,
+                  "snippet": {
+                    "text": "strcpy(Buffer2S, Input)",
+                    "rendered": {
+                      "text": "strcpy(Buffer2S, Input)",
+                      "markdown": "`strcpy(Buffer2S, Input)`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "glog-pfp-ruleFileLineCode/v1": "7d5a43e4e5131540477015518650dd0514a144eb4dcfb754376958611ea39a23",
+            "glog-pfp-ruleFileCode/v1": "d35f9e84f20917ee059f86d3df9b5e5a604f51d5b259946f6267464c4f9079e5"
+          },
+          "fingerprints": {
+            "glog-fp-ruleFileCode/v1": "d35f9e84f20917ee059f86d3df9b5e5a604f51d5b259946f6267464c4f9079e5"
+          },
+          "fixes": [
+            {
+              "description": {
+                "text": "strcpy is frequently dangerous, as it will cause a buffer overflow if the source is larger than the destination."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "essfunc.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 3133,
+                        "charLength": 23
+                      },
+                      "insertedContent": {
+                        "text": "strcpy_s(Buffer2S, <size of Buffer2S>,  Input)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "description": {
+                "text": "strcpy is frequently dangerous, as it will cause a buffer overflow if the source is larger than the destination."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "essfunc.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 3133,
                         "charLength": 23
                       },
                       "insertedContent": {
@@ -3414,53 +3192,6 @@
           }
         },
         {
-          "ruleId": "c492feb6-e097-3717-99e6-94b621911032",
-          "kind": "fail",
-          "level": "warning",
-          "message": {
-            "text": "Detected Prohibited C Function"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "vulnserver.c"
-                },
-                "region": {
-                  "startLine": 51,
-                  "startColumn": 31,
-                  "endLine": 51,
-                  "endColumn": 35,
-                  "charOffset": 2573,
-                  "charLength": 4,
-                  "snippet": {
-                    "text": "atoi",
-                    "rendered": {
-                      "text": "atoi",
-                      "markdown": "`atoi`"
-                    }
-                  },
-                  "sourceLanguage": "c"
-                }
-              }
-            }
-          ],
-          "partialFingerprints": {
-            "glog-pfp-ruleFileLineCode/v1": "229df022241c0fbfd0333c8497b74c2feabccc8802f0462d4666c765e5dbc77b",
-            "glog-pfp-ruleFileCode/v1": "c5bef295a5a6d0797cec908d553ffce6a3f83cd7ae451a00a0972ddd2ba2cd6f"
-          },
-          "fingerprints": {
-            "glog-fp-ruleFileCode/v1": "c5bef295a5a6d0797cec908d553ffce6a3f83cd7ae451a00a0972ddd2ba2cd6f"
-          },
-          "properties": {
-            "DevSkimSeverity": "Moderate",
-            "DevSkimConfidence": "High",
-            "tags": [
-              "API.DangerousAPI.BannedFunction"
-            ]
-          }
-        },
-        {
           "ruleId": "a4d072bf-5ae6-3408-91dd-2a745d716279",
           "kind": "fail",
           "level": "error",
@@ -3540,6 +3271,291 @@
                       },
                       "insertedContent": {
                         "text": "strlcpy(PortNumber,  argv[1],  6)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.BannedFunction"
+            ]
+          }
+        },
+        {
+          "ruleId": "00448155-e255-3e9d-ab46-8b62dea81a76",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "\"Detected Use of Prohibited C Function (strcpy)\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "essfunc.c"
+                },
+                "region": {
+                  "startLine": 100,
+                  "startColumn": 1,
+                  "endLine": 100,
+                  "endColumn": 24,
+                  "charOffset": 2908,
+                  "charLength": 23,
+                  "snippet": {
+                    "text": "strcpy(Buffer2S, Input)",
+                    "rendered": {
+                      "text": "strcpy(Buffer2S, Input)",
+                      "markdown": "`strcpy(Buffer2S, Input)`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "glog-pfp-ruleFileLineCode/v1": "7ad8c3d05573ce068e1f1778be696f2f41ada77faf9c27ea9d324dd2a6026f1a",
+            "glog-pfp-ruleFileCode/v1": "0014eb5fbc7317503d8f19c9edd530a13bfb07d19e8805543587d624e507f924"
+          },
+          "fingerprints": {
+            "glog-fp-ruleFileCode/v1": "0014eb5fbc7317503d8f19c9edd530a13bfb07d19e8805543587d624e507f924"
+          },
+          "fixes": [
+            {
+              "description": {
+                "text": "strcpy is frequently dangerous, as it will cause a buffer overflow if the source is larger than the destination."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "essfunc.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 2908,
+                        "charLength": 23
+                      },
+                      "insertedContent": {
+                        "text": "strcpy_s(Buffer2S, <size of Buffer2S>,  Input)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "description": {
+                "text": "strcpy is frequently dangerous, as it will cause a buffer overflow if the source is larger than the destination."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "essfunc.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 2908,
+                        "charLength": 23
+                      },
+                      "insertedContent": {
+                        "text": "strlcpy(Buffer2S,  Input, <size of Buffer2S>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.BannedFunction"
+            ]
+          }
+        },
+        {
+          "ruleId": "6705d439-af43-38cd-a04b-3292c3ad405c",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Detected Vulnerability in C Function (strlen)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "vulnserver.c"
+                },
+                "region": {
+                  "startLine": 51,
+                  "startColumn": 58,
+                  "endLine": 51,
+                  "endColumn": 73,
+                  "charOffset": 2600,
+                  "charLength": 15,
+                  "snippet": {
+                    "text": "strlen(argv[1])",
+                    "rendered": {
+                      "text": "strlen(argv[1])",
+                      "markdown": "`strlen(argv[1])`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "glog-pfp-ruleFileLineCode/v1": "57ea090b75b6d2e74b3b30fc8af8a987696efdce69f35092b10015c1164d4fe2",
+            "glog-pfp-ruleFileCode/v1": "65fdbae3ff771a948678aa614c9307cc00ff1de6ed36125f88f8987dcacc7d1b"
+          },
+          "fingerprints": {
+            "glog-fp-ruleFileCode/v1": "65fdbae3ff771a948678aa614c9307cc00ff1de6ed36125f88f8987dcacc7d1b"
+          },
+          "fixes": [
+            {
+              "description": {
+                "text": "If a string is missing a null terminator, strlen will read past the end of the buffer"
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "vulnserver.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 2600,
+                        "charLength": 15
+                      },
+                      "insertedContent": {
+                        "text": "strlen_s(argv[1], <size of argv[1]>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "description": {
+                "text": "If a string is missing a null terminator, strlen will read past the end of the buffer"
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "vulnserver.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 2600,
+                        "charLength": 15
+                      },
+                      "insertedContent": {
+                        "text": "strnlen(argv[1], <size of argv[1]>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "BestPractice",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.ProblematicFunction"
+            ]
+          }
+        },
+        {
+          "ruleId": "e7828855-98ed-3379-b683-56e26fb8b2f7",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "\"Detected Use of Prohibited C Function (strcpy)\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "essfunc.c"
+                },
+                "region": {
+                  "startLine": 95,
+                  "startColumn": 1,
+                  "endLine": 95,
+                  "endColumn": 24,
+                  "charOffset": 2818,
+                  "charLength": 23,
+                  "snippet": {
+                    "text": "strcpy(Buffer2S, Input)",
+                    "rendered": {
+                      "text": "strcpy(Buffer2S, Input)",
+                      "markdown": "`strcpy(Buffer2S, Input)`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "glog-pfp-ruleFileLineCode/v1": "58232a0a52849d26ed2c074de130a78a4e345baa9b50d2a773bdd658be910bf0",
+            "glog-pfp-ruleFileCode/v1": "7ca43a963051f01a8aac68131fc543d24ef74670a98641156535821a645b6738"
+          },
+          "fingerprints": {
+            "glog-fp-ruleFileCode/v1": "7ca43a963051f01a8aac68131fc543d24ef74670a98641156535821a645b6738"
+          },
+          "fixes": [
+            {
+              "description": {
+                "text": "strcpy is frequently dangerous, as it will cause a buffer overflow if the source is larger than the destination."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "essfunc.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 2818,
+                        "charLength": 23
+                      },
+                      "insertedContent": {
+                        "text": "strcpy_s(Buffer2S, <size of Buffer2S>,  Input)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "description": {
+                "text": "strcpy is frequently dangerous, as it will cause a buffer overflow if the source is larger than the destination."
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "essfunc.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 2818,
+                        "charLength": 23
+                      },
+                      "insertedContent": {
+                        "text": "strlcpy(Buffer2S,  Input, <size of Buffer2S>)"
                       }
                     }
                   ]
